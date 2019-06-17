@@ -1,0 +1,65 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"io"
+	"os"
+)
+
+const (
+	inputSize = 1024
+)
+
+type input struct {
+	arr []byte
+	position int
+}
+
+func inputInit() (in input){
+	info := bufio.NewReader(os.Stdin)
+	res, lensSum := make([]*[]byte, 0, 8), 0
+	for{
+		p := make([]byte, inputSize)
+		n, err := info.Read(p)
+		if err == io.EOF{
+			break
+		}
+		lensSum += n
+		p = p[:n]
+		res = append(res, &p)
+	}
+	result := make([]byte, lensSum)
+	for _, a := range res{
+		result = append(result, *a...)
+	}
+	in.arr = result
+	return
+}
+
+func (in *input) getArrByte() (res []byte){
+	res = make([]byte, 0, 64)
+	for ; in.position != len(in.arr) && (in.arr[in.position] == ' ' || in.arr[in.position] == '\n' || in.arr[in.position] == 0); in.position++{}
+	for ; in.position != len(in.arr) && in.arr[in.position] != ' ' && in.arr[in.position] != '\n'; in.position++{
+		res = append(res, in.arr[in.position])
+	}
+	for ; in.position != len(in.arr) && (in.arr[in.position] == ' ' || in.arr[in.position] == '\n' || in.arr[in.position] == 0); in.position++{}
+	return
+}
+
+func (in *input) getInt() (res int){
+	str := in.getArrByte()
+	for index, multiplier := len(str) - 1, 1; index >= 0; index, multiplier = index - 1, multiplier * 10{
+		res += int(str[index] - '0') * multiplier
+	}
+	return
+}
+
+func (in *input) getString() string{
+	return string(in.getArrByte())
+}
+
+func main(){
+	in := inputInit()
+	fmt.Println(in.getInt())
+}
